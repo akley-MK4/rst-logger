@@ -157,7 +157,7 @@ func main() {
 	os.Exit(0)
 }
 ```
-```
+
 The above example will output the following logs
 ```text
 {"level":"Tracing","profile":{"src":{"file":"/home/op1/go_project_local/rst-logger/example/json_format_logger/main.go","line":76,"function":"main.main"}},"message":"Using the All function to output logs with level ALL"}
