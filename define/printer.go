@@ -126,3 +126,7 @@ func (t *Printer) OutputBytesContent(lv LogLevel, v ...[]byte) (retErr error) {
 func (t *Printer) SetLogLevel(lv LogLevel) {
 	t.lv = lv
 }
+
+func (t *Printer) GetLevel() LogLevel {
+	return t.lv
+}

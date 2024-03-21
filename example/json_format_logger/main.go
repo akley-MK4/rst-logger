@@ -89,5 +89,6 @@ func main() {
 	logger.ErrorF("Using the ErrorF function to output logs with level ERROR, "+
 		"%s, %d, %v", "output...", 1, true)
 
+	logger.InfoF("Current log level %v", logger.GetLevel())
 	os.Exit(0)
 }

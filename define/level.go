@@ -6,6 +6,7 @@ const (
 	LogLevelInfo
 	LogLevelWarning
 	LogLevelError
+	LogLevelInvalid
 )
 
 func BuildDefaultLevelDescMap() map[LogLevel]string {
