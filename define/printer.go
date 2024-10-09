@@ -154,6 +154,10 @@ func (t *Printer) SetLogLevel(lv LogLevel) {
 	t.lv = lv
 }
 
+func (t *Printer) GetLevel() LogLevel {
+	return t.lv
+}
+
 func (t *Printer) CleanOutputBuffer() (capacitySize int) {
 	if t.enabledBufferPool {
 		return 0

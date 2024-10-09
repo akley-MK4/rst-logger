@@ -106,6 +106,13 @@ func (t *BasicFormatLogger) SetLevelByDesc(levelDesc string) (retUpdated bool) {
 	return
 }
 
+func (t *BasicFormatLogger) GetLevel() define.LogLevel {
+	if t.printer == nil {
+		return define.LogLevelInvalid
+	}
+	return t.printer.GetLevel()
+}
+
 func (t *BasicFormatLogger) CleanOutputBuffer() int {
 	return t.printer.CleanOutputBuffer()
 }
