@@ -18,28 +18,33 @@ var (
 	}
 )
 
-func NewPrinter(outWriter io.Writer, lv LogLevel, callDepth int, beforeFmtOpts, afterFmtOpts []OutputOption, disableLFChar bool) (*Printer, error) {
+func NewPrinter(outWriter io.Writer, lv LogLevel, callDepth int, beforeFmtOpts, afterFmtOpts []OutputOption, disableLFChar, enabledBufferPool bool) (*Printer, error) {
 	if outWriter == nil {
 		return nil, errors.New("the outWriter is a nil value")
 	}
 
 	return &Printer{
-		outWriter:      outWriter,
-		lv:             lv,
-		callDepth:      callDepth,
-		beforeFmtOpts:  beforeFmtOpts,
-		afterFmtOpts:   afterFmtOpts,
-		disabledLFChar: disableLFChar,
+		outWriter:         outWriter,
+		lv:                lv,
+		callDepth:         callDepth,
+		beforeFmtOpts:     beforeFmtOpts,
+		afterFmtOpts:      afterFmtOpts,
+		disabledLFChar:    disableLFChar,
+		outputBuffer:      &bytes.Buffer{},
+		enabledBufferPool: enabledBufferPool,
 	}, nil
 }
 
 type Printer struct {
-	lv             LogLevel
-	callDepth      int
-	beforeFmtOpts  []OutputOption
-	afterFmtOpts   []OutputOption
-	outWriter      io.Writer
-	disabledLFChar bool
+	lv                LogLevel
+	callDepth         int
+	beforeFmtOpts     []OutputOption
+	afterFmtOpts      []OutputOption
+	outWriter         io.Writer
+	disabledLFChar    bool
+	outputMutex       sync.Mutex
+	outputBuffer      *bytes.Buffer
+	enabledBufferPool bool
 }
 
 func (t *Printer) OutputFormatContent(lv LogLevel, format string, v ...any) (retErr error) {
@@ -50,10 +55,21 @@ func (t *Printer) OutputFormatContent(lv LogLevel, format string, v ...any) (ret
 		return errors.New("no output values")
 	}
 
-	buf := bufferPool.Get().(*bytes.Buffer)
+	var buf *bytes.Buffer
+	if t.enabledBufferPool {
+		buf = bufferPool.Get().(*bytes.Buffer)
+	} else {
+		t.outputMutex.Lock()
+		buf = t.outputBuffer
+	}
+
 	defer func() {
 		buf.Reset()
-		bufferPool.Put(buf)
+		if t.enabledBufferPool {
+			bufferPool.Put(buf)
+		} else {
+			t.outputMutex.Unlock()
+		}
 	}()
 
 	for _, opt := range t.beforeFmtOpts {
@@ -92,10 +108,21 @@ func (t *Printer) OutputBytesContent(lv LogLevel, v ...[]byte) (retErr error) {
 		return errors.New("no output values")
 	}
 
-	buf := bufferPool.Get().(*bytes.Buffer)
+	var buf *bytes.Buffer
+	if t.enabledBufferPool {
+		buf = bufferPool.Get().(*bytes.Buffer)
+	} else {
+		t.outputMutex.Lock()
+		buf = t.outputBuffer
+	}
+
 	defer func() {
 		buf.Reset()
-		bufferPool.Put(buf)
+		if t.enabledBufferPool {
+			bufferPool.Put(buf)
+		} else {
+			t.outputMutex.Unlock()
+		}
 	}()
 
 	for _, opt := range t.beforeFmtOpts {
@@ -125,4 +152,18 @@ func (t *Printer) OutputBytesContent(lv LogLevel, v ...[]byte) (retErr error) {
 
 func (t *Printer) SetLogLevel(lv LogLevel) {
 	t.lv = lv
+}
+
+func (t *Printer) CleanOutputBuffer() (capacitySize int) {
+	if t.enabledBufferPool {
+		return 0
+	}
+
+	t.outputMutex.Lock()
+	t.outputBuffer.Reset()
+	capacitySize = t.outputBuffer.Cap()
+	t.outputBuffer = &bytes.Buffer{}
+	t.outputMutex.Unlock()
+
+	return
 }

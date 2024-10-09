@@ -98,6 +98,11 @@ func main() {
 			"%s, %d, %d", "output...", 0, 0)
 	}
 
+	log.Printf("Clean basicFormatLogger capacitySize %d\n", basicFormatLogger.CleanOutputBuffer())
+	log.Printf("Clean jsonFormatLogger capacitySize %d\n", jsonFormatLogger.CleanOutputBuffer())
+
+	time.Sleep(time.Second * 1)
+	runtime.GC()
 	time.Sleep(time.Second * 1)
 	runtime.GC()
 	time.Sleep(time.Second * 5)

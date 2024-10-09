@@ -1,10 +1,11 @@
 package main
 
 import (
-	"github.com/akley-MK4/rst-logger/define"
-	"github.com/akley-MK4/rst-logger/implement"
 	"log"
 	"os"
+
+	"github.com/akley-MK4/rst-logger/define"
+	"github.com/akley-MK4/rst-logger/implement"
 )
 
 func main() {
@@ -12,6 +13,7 @@ func main() {
 		EnableDefaultOpt:     true,
 		Prefix:               "[App]",
 		DisablePrinterLFChar: false,
+		EnabledBufferPool:    false,
 	}
 
 	callDepth := 3

@@ -1,9 +1,10 @@
 package main
 
 import (
+	"os"
+
 	"github.com/akley-MK4/rst-logger/define"
 	"github.com/akley-MK4/rst-logger/implement"
-	"os"
 )
 
 func newBasicFormatLogger() (*implement.BasicFormatLogger, error) {
@@ -14,6 +15,7 @@ func newBasicFormatLogger() (*implement.BasicFormatLogger, error) {
 		Prefix:               "[App]",
 		DisablePrinterLFChar: false,
 		NewLogLvDescMap:      logLvDescMap,
+		EnabledBufferPool:    true,
 	}
 
 	return implement.NewBasicFormatLogger(os.Stdout, define.LogLevelALL, 3, kw)

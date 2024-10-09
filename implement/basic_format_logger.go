@@ -3,9 +3,10 @@ package implement
 import (
 	"bytes"
 	"errors"
-	"github.com/akley-MK4/rst-logger/define"
 	"io"
 	"strconv"
+
+	"github.com/akley-MK4/rst-logger/define"
 )
 
 type KwArgsBasicFormatLogger struct {
@@ -18,6 +19,7 @@ type KwArgsBasicFormatLogger struct {
 	AdditionalAfterFmtOpts  []define.OutputOption
 	NewLogLvDescMap         map[define.LogLevel]string
 	DisablePrinterLFChar    bool
+	EnabledBufferPool       bool
 }
 
 func NewBasicFormatLogger(outWriter io.Writer, lv define.LogLevel, callDepth int, kw KwArgsBasicFormatLogger) (*BasicFormatLogger, error) {
@@ -68,7 +70,7 @@ func NewBasicFormatLogger(outWriter io.Writer, lv define.LogLevel, callDepth int
 	beforeFmtOpts := append(newOpts, kw.AdditionalBeforeFmtOpts...)
 	afterFmtOpts := append([]define.OutputOption{}, kw.AdditionalAfterFmtOpts...)
 
-	printer, printerErr := define.NewPrinter(outWriter, lv, callDepth, beforeFmtOpts, afterFmtOpts, kw.DisablePrinterLFChar)
+	printer, printerErr := define.NewPrinter(outWriter, lv, callDepth, beforeFmtOpts, afterFmtOpts, kw.DisablePrinterLFChar, kw.EnabledBufferPool)
 	if printerErr != nil {
 		return nil, printerErr
 	}
@@ -102,6 +104,10 @@ func (t *BasicFormatLogger) SetLevelByDesc(levelDesc string) (retUpdated bool) {
 
 	t.printer.SetLogLevel(chooseLv)
 	return
+}
+
+func (t *BasicFormatLogger) CleanOutputBuffer() int {
+	return t.printer.CleanOutputBuffer()
 }
 
 func (t *BasicFormatLogger) All(v ...any) {

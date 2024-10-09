@@ -2,11 +2,12 @@ package main
 
 import (
 	"bytes"
-	"github.com/akley-MK4/rst-logger/define"
-	"github.com/akley-MK4/rst-logger/implement"
 	"os"
 	"runtime"
 	"strconv"
+
+	"github.com/akley-MK4/rst-logger/define"
+	"github.com/akley-MK4/rst-logger/implement"
 )
 
 func newJsonFormatLogger() (*implement.BasicFormatLogger, error) {
@@ -16,6 +17,7 @@ func newJsonFormatLogger() (*implement.BasicFormatLogger, error) {
 		EnableDefaultOpt:     false,
 		DisablePrinterLFChar: true,
 		NewLogLvDescMap:      logLvDescMap,
+		EnabledBufferPool:    false,
 	}
 
 	kw.AdditionalBeforeFmtOpts = append(kw.AdditionalBeforeFmtOpts, func(lv define.LogLevel, callDepth int, buf *bytes.Buffer) {
